@@ -1,10 +1,18 @@
-# Lab 3
+# Lab 3 - Classification
 
-Submission for CMPE 255 Lab 3 under Professor Sithu Aung.
+[Pima Indian Diabetes dataset](https://www.kaggle.com/uciml/pima-indians-diabetes-database?select=diabetes.csv) from the UCI Machine Learning Repository
 
-## Results
-Accuracy of SGDClassifier = 0.9684285714285714  
-Accuracy of KNN model = 0.9952857142857143  
-confusion matrix for the y_test using knn model =  
-[6303   39]  
-[  63  595]
+## Question
+
+* Can we predict the diabetes status of a patient given their health measurements? Build a classifer and calculate Confusion matrix with
+
+- True Positives (TP): we correctly predicted that they do have diabetes
+- True Negatives (TN): we correctly predicted that they don't have diabetes
+- False Positives (FP): we incorrectly predicted that they do have diabetes (a "Type I error")
+- False Negatives (FN): we incorrectly predicted that they don't have diabetes (a "Type II error")
+
+
+
+
+
+

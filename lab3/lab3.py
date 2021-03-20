@@ -1,114 +1,70 @@
-#!/usr/bin/env python
-# coding: utf-8
+import pandas as pd
 
-# In[105]:
-
-
-import numpy as np
-import os
-
-np.random.seed(42)
-
-# To plot pretty figures
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-mpl.rc('axes', labelsize=14)
-mpl.rc('xtick', labelsize=12)
-mpl.rc('ytick', labelsize=12)
-
-from sklearn.linear_model import SGDClassifier
-from sklearn.datasets import fetch_openml
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_predict
-from sklearn.metrics import confusion_matrix
+from sklearn.linear_model import LogisticRegression
+from sklearn import metrics
 
+        
+class DiabetesClassifier:
+    def __init__(self) -> None:
+        col_names = ['pregnant', 'glucose', 'bp', 'skin', 'insulin', 'bmi', 'pedigree', 'age', 'label']
+        self.pima = pd.read_csv('diabetes.csv', header=0, names=col_names, usecols=col_names)
+        print(self.pima.head())
+        self.X_test = None
+        self.y_test = None
+        
 
-def random_digit():
-    some_digit = X[36000]
-    some_digit_image = some_digit.reshape(28, 28)
-    plt.imshow(some_digit_image, cmap = mpl.cm.binary,
-            interpolation="nearest")
-    plt.axis("off")
-    plt.show()
-
-
-
-def load_data():
-    mnist = fetch_openml('mnist_784', version=1, cache=True)
-    mnist.target = mnist.target.astype(np.int8) # fetch_openml() returns targets as strings
-    return mnist
-
-
-
-mnist = load_data()
-X = mnist.data.to_numpy()
-y = mnist.target.to_numpy()
-X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.10, random_state=42)
-
-
-
-random_digit()
-
-
-
-def create_new_y(dataset):
-    new_y_data = []
-    for i in dataset:
-        if i==5:
-            new_y_data.append(True)
-        else:
-            new_y_data.append(False)   
-    return new_y_data
+    def define_feature(self):
+        feature_cols = ['pregnant', 'insulin', 'bmi', 'age']
+        X = self.pima[feature_cols]
+        y = self.pima.label
+        return X, y
     
-new_y_train = create_new_y(y_train)
-new_y_test = create_new_y(y_test)
-
-
-
-
-def SGDModel(x,y):
-    clf = SGDClassifier(max_iter=1000, tol=1e-3)
-    clf.fit(x, y)
-    return clf
+    def define_new_feature(self,features):
+        feature_cols =  features
+        X = self.pima[feature_cols]
+        y = self.pima.label
+        return X, y
     
-def getAccuracy(clf,x_test,y_test):
-    pered = clf.predict(x_test)
-    return accuracy_score(y_test,pered)
+
+    def train(self,features):
+        # split X and y into training and testing sets
+        X, y = self.define_new_feature(features)
+        X_train, self.X_test, y_train, self.y_test = train_test_split(X, y, random_state=0)
+        # train a logistic regression model on the training set
+        logreg = LogisticRegression()
+        logreg.fit(X_train, y_train)
+        return logreg
     
-def KNNmodel(x,y):
-    knn=KNeighborsClassifier(n_neighbors=3)
-    knn.fit(x,y)
-    return knn
+    def predict(self,features):
+        model = self.train(features)
+        y_pred_class = model.predict(self.X_test)
+        return y_pred_class
 
 
-clf = SGDModel(X_train, new_y_train)
-SGDC_accuracy = getAccuracy(clf, X_test, new_y_test)
-print("SGDClassifier model accuracy is = ")
-print(SGDC_accuracy)
+    def calculate_accuracy(self, result):
+        return metrics.accuracy_score(self.y_test, result)
 
 
-### SGDClassifier Accuracy = 0.9671428571428572
-
-
-knn = KNNmodel(X_train, new_y_train)
-KNN_accuracy = getAccuracy(knn, X_test, new_y_test)
-print("KNN Accuracy is = ")
-print(KNN_accuracy)
-
-
-### KNN Accuracy = 0.9952857142857143
-
-def crossVal():
-    y_test_pred = cross_val_predict(knn, X_test, new_y_test, cv=3)
-    return confusion_matrix(new_y_test,y_test_pred)
-
-
-confusionMatrix = crossVal()
-print("Confusion Matrix = ")
-print(confusionMatrix)
-
-plt.imshow(X_test[1222].reshape(28,28))
-
-y_test[1222]
+    def examine(self):
+        dist = self.y_test.value_counts()
+        print(dist)
+        percent_of_ones = self.y_test.mean()
+        percent_of_zeros = 1 - self.y_test.mean()
+        return self.y_test.mean()
+    
+    def confusion_matrix(self, result):
+        return metrics.confusion_matrix(self.y_test, result)
+    
+if __name__ == "__main__":
+    classifer = DiabetesClassifier()
+    features = [['bmi', 'glucose','age'],['bmi', 'glucose'],['pregnant', 'glucose', 'bmi', 'pedigree', 'age'],['bmi', 'glucose','age','pregnant'],['pregnant', 'glucose', 'bp', 'skin', 'insulin', 'bmi', 'pedigree', 'age']]
+    for feature_set in features:
+        result = classifer.predict(feature_set)
+        # print(f"Predicition={result}")
+        print(f"\n\nResults for the feature set = {feature_set}")
+        score = classifer.calculate_accuracy(result)
+        print(f"score={score}")
+        con_matrix = classifer.confusion_matrix(result)
+        print(f"confusion_matrix=${con_matrix}")
+    
