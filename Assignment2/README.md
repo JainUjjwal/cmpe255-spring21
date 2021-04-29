@@ -16,7 +16,8 @@ def load_data():
     print(faces.target_names)
     print(faces.images_shape)
 ```
-
+### _Note: Running the code locally would only get half the data (4 classes and 820 samples instead of 8 classes and 1348 samples) from sklearn, running the python notebook on google collab obtained the full data and thus gave the output presented in the table. (the plots were all recorded locally and thus reflect accordingly)_
+  
 ## Requirements
 
 Each image contains [62x47] or nearly 3,000 pixels. Use each pixel value as a feature. You will use RandomizedPCA to extract 150 fundamental components to feed into your SVM model as a single pipeline.
@@ -30,6 +31,8 @@ pca = PCA(n_components=n_components, svd_solver='randomized', whiten=True)
 svc = SVC(kernel='rbf', class_weight='balanced')
 model = make_pipeline(pca, svc)
 ```
+
+
 ## Tasks
 1. Split the data into a training and testing set.
 ### Answer
@@ -71,3 +74,5 @@ best_esitmator = SVC(C=1000.0, break_ties=False, cache_size=200, class_weight='b
 ### Answer
 > Filename:  
 > snsheatmap.png
+
+
